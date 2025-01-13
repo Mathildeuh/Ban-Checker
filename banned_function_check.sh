@@ -4,6 +4,36 @@
 # Crée et installe le script "banned_function" sur la machine
 
 INSTALL_PATH="/usr/local/bin/banned_function"
+REPO_URL="https://raw.githubusercontent.com/Mathildeuh/Ban-Checker/main/banned_function_check.sh"
+LOCAL_VERSION_FILE="/tmp/ban_checker_version"
+LATEST_VERSION=$(curl -sI $REPO_URL | grep -i "last-modified" | sed 's/Last-Modified: //')
+
+# Fonction pour vérifier les mises à jour
+check_for_update() {
+    # Si le fichier de version local n'existe pas, le créer
+    if [ ! -f "$LOCAL_VERSION_FILE" ]; then
+        echo "0" > "$LOCAL_VERSION_FILE"
+    fi
+
+    # Lire la version locale stockée dans le fichier
+    LOCAL_VERSION=$(cat "$LOCAL_VERSION_FILE")
+
+    # Comparer la version locale avec la version la plus récente
+    if [ "$LOCAL_VERSION" != "$LATEST_VERSION" ]; then
+        echo "Mise à jour disponible pour le script 'banned_function'."
+        echo "Téléchargement de la dernière version..."
+        # Télécharger la dernière version du script avec sudo
+        sudo curl -sSL $REPO_URL -o "$INSTALL_PATH"
+        sudo chmod +x "$INSTALL_PATH"
+        echo "$LATEST_VERSION" > "$LOCAL_VERSION_FILE"
+        echo "Le script a été mis à jour avec succès."
+    else
+        echo "Le script est à jour."
+    fi
+}
+
+# Vérification de mise à jour avant de commencer l'installation
+check_for_update
 
 # Créer le script "banned_function"
 sudo bash -c "cat > $INSTALL_PATH" << 'EOF'
