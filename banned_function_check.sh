@@ -27,8 +27,6 @@ check_for_update() {
         sudo chmod +x "$INSTALL_PATH"
         echo "$LATEST_VERSION" > "$LOCAL_VERSION_FILE"
         echo "Le script a été mis à jour avec succès."
-    else
-        echo "Le script est à jour."
     fi
 }
 
@@ -66,8 +64,6 @@ check_for_update() {
         sudo chmod +x "$INSTALL_PATH"
         echo "$LATEST_VERSION" > "$LOCAL_VERSION_FILE"
         echo "Le script a été mis à jour avec succès."
-    else
-        echo "Le script est à jour."
     fi
 }
 
