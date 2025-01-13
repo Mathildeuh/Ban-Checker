@@ -45,24 +45,27 @@ REPO_URL="https://raw.githubusercontent.com/Mathildeuh/Ban-Checker/main/banned_f
 LOCAL_VERSION_FILE="/tmp/ban_checker_version"
 LATEST_VERSION=$(curl -sI $REPO_URL | grep -i "last-modified" | sed 's/Last-Modified: //')
 
+# Version actuelle du script
+SCRIPT_VERSION="1.1.0"
+
 # Fonction pour vérifier les mises à jour
 check_for_update() {
     # Si le fichier de version local n'existe pas, le créer
     if [ ! -f "$LOCAL_VERSION_FILE" ]; then
-        echo "0" > "$LOCAL_VERSION_FILE"
+        echo "$SCRIPT_VERSION" > "$LOCAL_VERSION_FILE"
     fi
 
     # Lire la version locale stockée dans le fichier
     LOCAL_VERSION=$(cat "$LOCAL_VERSION_FILE")
 
     # Comparer la version locale avec la version la plus récente
-    if [ "$LOCAL_VERSION" != "$LATEST_VERSION" ]; then
+    if [ "$LOCAL_VERSION" != "$SCRIPT_VERSION" ]; then
         echo "Mise à jour disponible pour le script 'banned_functions'."
         echo "Téléchargement de la dernière version..."
         # Télécharger la dernière version du script avec sudo
         sudo curl -sSL $REPO_URL -o "$INSTALL_PATH"
         sudo chmod +x "$INSTALL_PATH"
-        echo "$LATEST_VERSION" > "$LOCAL_VERSION_FILE"
+        echo "$SCRIPT_VERSION" > "$LOCAL_VERSION_FILE"
         echo "Le script a été mis à jour avec succès."
     fi
 }
@@ -184,6 +187,9 @@ else
     exit 1
 fi
 EOF
+
+# Ajouter la version au fichier installé
+echo "$SCRIPT_VERSION" > "/tmp/banned_functions_version"
 
 # Rendre le script exécutable
 sudo chmod +x "$INSTALL_PATH"
