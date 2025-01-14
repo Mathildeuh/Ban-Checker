@@ -82,6 +82,7 @@ total_violations=0
 files_with_violations=0
 
 # Fonction pour vérifier un fichier
+# Fonction pour vérifier un fichier
 check_file() {
     local file="$1"
     local file_violations=0
@@ -89,7 +90,8 @@ check_file() {
 
     for func in "${LIBC_FUNCTIONS[@]}"; do
         if [[ ! " ${ALLOWED_FUNCTIONS[@]} " =~ " ${func} " ]]; then
-            local violations=$(grep -n "\\b${func}\\(" "$file" 2>/dev/null || true)
+            # Vérification améliorée avec une regex qui capture mieux les appels de fonction
+            local violations=$(grep -P -n "\\b${func}\\b" "$file" 2>/dev/null || true)
             if [ ! -z "$violations" ]; then
                 if [ $first_violation -eq 1 ]; then
                     echo -e "\n${YELLOW}File: $file${NC}"
