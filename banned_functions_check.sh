@@ -25,34 +25,9 @@ if [ "$(id -u)" != "0" ]; then
 fi
 
 # Affichage d'un message d'accueil
-echo -e "${BLUE}=======================================${NC}"
+echo -e "${BLUE}================================================${NC}"
 echo -e "${BLUE}    Installation du${NC} ${YELLOW}Banned Function Checker${NC}"
-echo -e "${BLUE}=======================================${NC}"
-
-# Vérification si le script existe déjà
-if [ -f "$INSTALL_PATH" ]; then
-    echo -e "${YELLOW}ATTENTION: Une version du script existe déjà.${NC}"
-    echo -ne "${YELLOW}Voulez-vous la remplacer ? [y/N] ${NC}"
-    read -r response
-    if [[ ! "$response" =~ ^[Yy]$ ]]; then
-        echo -e "${BLUE}Installation annulée.${NC}"
-        exit 0
-    fi
-    # Création d'une sauvegarde
-    echo -e "${BLUE}Création d'une sauvegarde de l'ancien script...${NC}"
-    cp "$INSTALL_PATH" "$BACKUP_PATH" || error_exit "Impossible de créer la sauvegarde"
-    echo -e "${GREEN}Sauvegarde créée dans $BACKUP_PATH${NC}"
-fi
-
-# Demande de confirmation
-echo -e "\n${YELLOW}Le script va être installé dans : $INSTALL_PATH${NC}"
-echo -ne "${YELLOW}Voulez-vous continuer ? [y/N] ${NC}"
-read -r response
-if [[ ! "$response" =~ ^[Yy]$ ]]; then
-    echo -e "${BLUE}Installation annulée.${NC}"
-    exit 0
-fi
-
+echo -e "${BLUE}================================================${NC}"
 echo -e "\n${GREEN}Début de l'installation...${NC}"
 
 # Créer le script "banned_functions"
