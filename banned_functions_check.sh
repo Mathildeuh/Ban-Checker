@@ -110,8 +110,8 @@ check_file() {
                     line_num=$(echo "$line" | cut -d: -f1)
                     line_content=$(echo "$line" | cut -d: -f2-)
                     
-                    # Format VSCode compatible output
-                    echo -e "${file}:${line_num}:1: ${RED}ERROR:${NC} Fonction non autorisée: '${func}'"
+                    # Format VSCode compatible output sans le mot ERROR
+                    echo -e "${file}:${line_num}:1: ${RED}Fonction non autorisée: '${func}'${NC}"
                     
                     ((file_violations++))
                 done <<< "$violations"
