@@ -32,7 +32,7 @@ cat > "$INSTALL_PATH" << 'EOL'
 #!/bin/bash
 # Script : banned_functions.sh
 # Vérifie si des fonctions non autorisées sont utilisées dans les fichiers source
-# Format de sortie compatible avec VSCode
+# Format de sortie compatible avec VSCode tout en gardant l'ancien format
 # Couleurs
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -100,24 +100,51 @@ should_exclude_file() {
 check_file() {
     local file="$1"
     local file_violations=0
+    local first_violation=1
     
+    # Stocker les violations par fonction
+    declare -A func_violations
+    
+    # Première passe pour collecter toutes les violations
     for func in "${LIBC_FUNCTIONS[@]}"; do
         if [[ ! " ${ALLOWED_FUNCTIONS[@]} " =~ " ${func} " ]]; then
             # Vérification avec une regex qui capture mieux les appels de fonction
             local violations=$(grep -P -n "\\b${func}\\b" "$file" 2>/dev/null || true)
             if [ ! -z "$violations" ]; then
-                while IFS= read -r line; do
-                    line_num=$(echo "$line" | cut -d: -f1)
-                    line_content=$(echo "$line" | cut -d: -f2-)
-                    
-                    # Format VSCode compatible output sans le mot ERROR
-                    echo -e "${file}:${line_num}:1: ${RED}Fonction non autorisée: '${func}'${NC}"
-                    
-                    ((file_violations++))
-                done <<< "$violations"
-                ((FILES_WITH_VIOLATIONS++))
+                func_violations["$func"]="$violations"
+                if [ $first_violation -eq 1 ]; then
+                    ((FILES_WITH_VIOLATIONS++))
+                    first_violation=0
+                fi
             fi
         fi
+    done
+    
+    # Pas de violations dans ce fichier
+    if [ $first_violation -eq 1 ]; then
+        return 0
+    fi
+    
+    # Afficher le nom du fichier
+    echo -e "\n${YELLOW}File: $file${NC}"
+    
+    # Format pour VSCode pour chaque violation
+    for func in "${!func_violations[@]}"; do
+        violations="${func_violations[$func]}"
+        echo -e "${RED}Unauthorized function '$func' found:${NC}"
+        
+        while IFS= read -r line; do
+            line_num=$(echo "$line" | cut -d: -f1)
+            line_content=$(echo "$line" | cut -d: -f2-)
+            
+            # Format VSCode compatible (sortie cachée)
+            echo -e "${file}:${line_num}:1: Fonction non autorisée: '${func}'"
+            
+            # Format humain lisible (format d'origine)
+            echo -e "  Line $line_num: $line_content"
+            
+            ((file_violations++))
+        done <<< "$violations"
     done
     
     if [ $file_violations -gt 0 ]; then
@@ -167,5 +194,5 @@ if [ -f "$BACKUP_PATH" ]; then
     echo -e "\n${BLUE}Note : Une sauvegarde de l'ancienne version a été créée dans $BACKUP_PATH${NC}"
 fi
 echo -e "\n${GREEN}L'installation est terminée.${NC}"
-echo -e "\n${YELLOW}Note : Les résultats sont désormais au format compatible avec VSCode${NC}"
-echo -e "${YELLOW}pour permettre la navigation par clic sur les erreurs.${NC}"
+echo -e "\n${YELLOW}Note : Les résultats gardent le format original tout en ajoutant${NC}"
+echo -e "${YELLOW}une ligne au format compatible VSCode pour chaque erreur.${NC}"
